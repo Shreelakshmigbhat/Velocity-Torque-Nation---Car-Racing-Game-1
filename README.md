@@ -52,6 +52,12 @@ Future Enhancements
 
 Real-time leaderboard
 
+Multiplayer mode
+
+Car customization and upgrades
+
+Mobile-friendly interface
+
 How it looks:
 <img width="2814" height="1345" alt="image" src="https://github.com/user-attachments/assets/1adfbac8-8f67-47a0-a4da-bfc2848498a0" />
 
@@ -61,10 +67,6 @@ How it looks:
 
 
 
-Multiplayer mode
 
-Car customization and upgrades
-
-Mobile-friendly interface
 
 
