@@ -51,7 +51,14 @@ Open in browser http://localhost:5173
 Future Enhancements
 
 Real-time leaderboard
-<img width="2841" height="1336" alt="image" src="https://github.com/user-attachments/assets/f2aff8a3-dc61-43c8-86de-c73504258123" />
+
+How it looks:
+<img width="2814" height="1345" alt="image" src="https://github.com/user-attachments/assets/1adfbac8-8f67-47a0-a4da-bfc2848498a0" />
+
+<img width="2837" height="1309" alt="image" src="https://github.com/user-attachments/assets/3cb51494-a821-4377-8bf4-2caa9b14912b" />
+
+<img width="2873" height="1318" alt="image" src="https://github.com/user-attachments/assets/d3c47384-085d-4609-88a6-986b35640cce" />
+
 
 
 Multiplayer mode
