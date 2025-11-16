@@ -61,9 +61,19 @@ Mobile-friendly interface
 How it looks:
 <img width="2814" height="1345" alt="image" src="https://github.com/user-attachments/assets/1adfbac8-8f67-47a0-a4da-bfc2848498a0" />
 
-<img width="2837" height="1309" alt="image" src="https://github.com/user-attachments/assets/3cb51494-a821-4377-8bf4-2caa9b14912b" />
+<img width="2810" height="1320" alt="image" src="https://github.com/user-attachments/assets/f4d1e35d-d0df-4e15-ac6d-a993b48354e6" />
 
-<img width="2873" height="1318" alt="image" src="https://github.com/user-attachments/assets/d3c47384-085d-4609-88a6-986b35640cce" />
+day mode 
+
+<img width="2817" height="1296" alt="image" src="https://github.com/user-attachments/assets/0d45bb24-92cb-4fed-8cc5-b9650b48eb4f" />
+
+
+night mode
+
+<img width="2826" height="1296" alt="image" src="https://github.com/user-attachments/assets/6e100635-fc38-4a08-83f4-a4cb291d77e9" />
+
+
+
 
 
 
