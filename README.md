@@ -63,9 +63,11 @@ How it looks:
 
 <img width="2810" height="1320" alt="image" src="https://github.com/user-attachments/assets/f4d1e35d-d0df-4e15-ac6d-a993b48354e6" />
 
-day mode 
-
 <img width="2817" height="1296" alt="image" src="https://github.com/user-attachments/assets/0d45bb24-92cb-4fed-8cc5-b9650b48eb4f" />
+day mode 
+<img width="2810" height="1320" alt="image" src="https://github.com/user-attachments/assets/f4d1e35d-d0df-4e15-ac6d-a993b48354e6" />
+
+
 
 
 night mode
