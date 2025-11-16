@@ -7,6 +7,7 @@ const CompleteRacingGame = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [showAuth, setShowAuth] = useState(true);
   const [isLogin, setIsLogin] = useState(true);
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -23,6 +24,8 @@ const CompleteRacingGame = () => {
   const [speed, setSpeed] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [modeSelected, setModeSelected] = useState(null);
+
 
   const API_URL = 'http://localhost:5000/api';
 
@@ -166,19 +169,39 @@ const CompleteRacingGame = () => {
   useEffect(() => {
     if (!gameStarted || !isLoggedIn) return;
     
-    let scene, camera, renderer, car, road, obstacles = [];
+let scene, camera, renderer, car, road, obstacles = [];
     let carSpeed = 0;
     let carPosition = 0;
     let obstacleSpeed = 0.1;
     let gameRunning = true;
     let currentScore = 0;
-    
+    let trees = [];
+
     const keys = { left: false, right: false, up: false, down: false };
+
     
-    const init = () => {
+    // --- City Background Variables ---
+    let citySegments = [];
+     const CITY_SEGMENT_DEPTH = 60;
+     const CITY_SEGMENT_COUNT = 5;
+     const TOTAL_CITY_LENGTH = CITY_SEGMENT_DEPTH * CITY_SEGMENT_COUNT;
+     const CITY_SPEED_FACTOR = 0.35;
+
+     const BUILDING_COLORS = [
+     0x1f2933,
+     0x24354a,
+      0x2d4157,
+      0x35546b,
+       0x394861
+];
+
+    
+   const initNight = () => {
+ 
       scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0x87ceeb, 10, 50);
-      scene.background = new THREE.Color(0x87ceeb);
+      scene.background = new THREE.Color(0x050b16);
+      scene.fog = new THREE.FogExp2(0x050b16, 0.02);
+
       
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.set(0, 5, 8);
@@ -197,8 +220,22 @@ const CompleteRacingGame = () => {
       directionalLight.castShadow = true;
       scene.add(directionalLight);
       
-      createCar();
-      createRoad();
+     createCar();
+createRoad();
+createCityBackground();
+
+// --- Create roadside trees ---
+// Trees for night mode
+for (let i = 0; i < 40; i++) {
+  const z = -i * 10;
+  const leftTree = createTree(-6, z);
+  const rightTree = createTree(6, z);
+  trees.push(leftTree, rightTree);
+  scene.add(leftTree);
+  scene.add(rightTree);
+}
+
+
       
       for (let i = 0; i < 5; i++) {
         createObstacle(-20 - i * 10);
@@ -210,7 +247,158 @@ const CompleteRacingGame = () => {
       
       animate();
     };
+const initDay = () => {
+  scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87ceeb);
+
+     scene.fog = new THREE.Fog(0x87ceeb, 10, 50);
+
+
+      
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 5, 8);
+      camera.lookAt(0, 0, 0);
+      
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      mountRef.current.appendChild(renderer.domElement);
+      
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+
+
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      directionalLight.color.set(0xfff2cc); // warm sunlight
+
+      directionalLight.position.set(5, 10, 5);
+      directionalLight.castShadow = true;
+      scene.add(directionalLight);
+      
+     createCar();
+createRoad();
+createCityBackground();
+
+      
+      for (let i = 0; i < 5; i++) {
+        createObstacle(-20 - i * 10);
+      }
+      
+      window.addEventListener('keydown', onKeyDown);
+      window.addEventListener('keyup', onKeyUp);
+      window.addEventListener('resize', onWindowResize);
+  animate();
+};
+
     
+    // --- Create ONE building ---
+const createBuilding = ({ parent, x, z, width, height, depth, color }) => {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+
+  // Main tower
+  const tower = new THREE.Mesh(
+    new THREE.BoxGeometry(width, height, depth),
+    new THREE.MeshPhongMaterial({ color, flatShading: true })
+  );
+  tower.position.y = height / 2;
+  tower.castShadow = true;
+  group.add(tower);
+
+  // Optional roof
+  if (Math.random() > 0.6) {
+    const roof = new THREE.Mesh(
+      new THREE.ConeGeometry(width * 0.35, 1.4, 4),
+      new THREE.MeshPhongMaterial({ color: 0x121720 })
+    );
+    roof.position.y = height + 0.7;
+    group.add(roof);
+  }
+
+  // --- Windows (bright yellow rectangles) ---
+const windowGeometry = new THREE.PlaneGeometry(0.35, 0.55);
+const windowMaterial = new THREE.MeshBasicMaterial({
+  color: 0xffe066,
+  transparent: true,
+  opacity: 0.8
+});
+
+const floors = Math.floor(height / 1.2);
+const windowsPerFloor = Math.floor(width / 0.6);
+
+for (let floor = 0; floor < floors; floor++) {
+  for (let i = 0; i < windowsPerFloor; i++) {
+    const win = new THREE.Mesh(windowGeometry, windowMaterial);
+
+    win.position.set(
+      -width / 2 + 0.4 + i * 0.6,
+      0.5 + floor * 1.2,
+      depth / 2 + 0.002   // front face
+    );
+
+    // Small random flicker effect
+    win.material.opacity = 0.6 + Math.random() * 0.4;
+
+    group.add(win);
+  }
+}
+
+  parent.add(group);
+};
+
+// --- Create a segment of buildings ---
+const createCitySegment = (zOffset) => {
+  const segment = new THREE.Group();
+  segment.position.z = zOffset;
+
+  const laneSets = [
+    { lanes: [-11, -14.5, -18], jitter: 1.4 },
+    { lanes: [11, 14.5, 18], jitter: -1.4 }
+  ];
+
+  laneSets.forEach(({ lanes, jitter }) => {
+    lanes.forEach(lane => {
+      for (let i = 0; i < 3; i++) {
+        const width = 2 + Math.random() * 3;
+        const height = 8 + Math.random() * 12;
+        const depth = 2 + Math.random() * 3;
+        const color = BUILDING_COLORS[Math.floor(Math.random() * BUILDING_COLORS.length)];
+        const z = -CITY_SEGMENT_DEPTH/2 + i * (CITY_SEGMENT_DEPTH / 3) + (Math.random()*4 - 2);
+
+        createBuilding({
+          parent: segment,
+          x: lane + Math.random() * jitter,
+          z,
+          width,
+          height,
+          depth,
+          color
+        });
+      }
+    });
+  });
+
+  return segment;
+};
+
+// --- Create background ground + skyline + segments ---
+const createCityBackground = () => {
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(220, 400),
+    new THREE.MeshPhongMaterial({ color: 0x1a1d28 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.02;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  for (let i = 0; i < CITY_SEGMENT_COUNT; i++) {
+    const s = createCitySegment(-CITY_SEGMENT_DEPTH/2 - i * CITY_SEGMENT_DEPTH);
+    citySegments.push(s);
+    scene.add(s);
+  }
+};
+
     const createCar = () => {
       const carGroup = new THREE.Group();
       
@@ -313,6 +501,32 @@ const CompleteRacingGame = () => {
       obstacles.push(obstacle);
       scene.add(obstacle);
     };
+    // --- Create a tree (used in both day & night) ---
+const createTree = (x, z) => {
+  const tree = new THREE.Group();
+
+  // Trunk
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.2, 0.2, 1.2, 8),
+    new THREE.MeshPhongMaterial({ color: 0x8b5a2b })  // brown
+  );
+  trunk.position.y = 0.6;
+  tree.add(trunk);
+
+  // Leaves
+  const leaves = new THREE.Mesh(
+    new THREE.ConeGeometry(1, 2, 12),
+    new THREE.MeshPhongMaterial({ color: 0x2e8b57 })   // green
+  );
+  leaves.position.y = 2;
+  tree.add(leaves);
+
+  tree.position.set(x, 0, z);
+  tree.castShadow = true;
+
+  return tree;
+};
+
     
     const onKeyDown = (e) => {
       if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
@@ -385,11 +599,24 @@ const CompleteRacingGame = () => {
           });
         }
       });
+      // Move city background
+const parallaxSpeed = 0.112 + obstacleSpeed * CITY_SPEED_FACTOR;
+
+citySegments.forEach(segment => {
+  segment.position.z += parallaxSpeed;
+
+  if (segment.position.z > camera.position.z + CITY_SEGMENT_DEPTH) {
+    segment.position.z -= TOTAL_CITY_LENGTH;
+  }
+});
+
       
       renderer.render(scene, camera);
     };
     
-    init();
+    if (modeSelected === "night") initNight();
+if (modeSelected === "day") initDay();
+
     
     return () => {
       gameRunning = false;
@@ -647,6 +874,70 @@ const CompleteRacingGame = () => {
   }
 
   // Game UI
+
+  // ⭐ MODE SELECTION SCREEN GOES HERE ⭐
+
+if (!modeSelected) {
+  return (
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "white",
+        fontFamily: "Arial, sans-serif",
+
+        // ⭐ USE THIS ⭐
+        background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)),
+                     url('/vel.png') center/cover no-repeat`,
+      }}
+    >
+      <h1 style={{ fontSize: "42px", marginBottom: "30px" }}>
+        Choose Mode
+      </h1>
+
+      <button
+        onClick={() => setModeSelected("day")}
+        style={{
+          padding: "20px 40px",
+          marginBottom: "20px",
+          fontSize: "48px",
+          background: "#87CEEB",
+          borderRadius: "10px",
+          border: "none",
+          cursor: "pointer",
+          fontWeight: "bold"
+        }}
+      >
+        🌞 Day Mode
+      </button>
+
+      <button
+        onClick={() => setModeSelected("night")}
+        style={{
+          padding: "20px 40px",
+          fontSize: "48px",
+          background: "#061d48ff",
+          color: "white",
+          borderRadius: "10px",
+          border: "none",
+          cursor: "pointer",
+          fontWeight: "bold"
+        }}
+      >
+        🌙 Night Mode
+      </button>
+    </div>
+  );
+}
+
+// Game UI
+
+
+  
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative' }}>
       <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
