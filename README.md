@@ -76,6 +76,7 @@ night mode
 
 
 
+<img width="2826" height="1289" alt="image" src="https://github.com/user-attachments/assets/b3ef2b38-0b5b-407a-9b7d-ec3dd9694a51" />
 
 
 
